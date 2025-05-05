@@ -9,7 +9,7 @@ const CONFIG = {
 let currentPlayer = null;
 let playerBattles = [];
 let originalBattles = []; // Зберігаємо оригінальні дані для фільтрування
-let currentLanguage = 'ua'; // Поточна мова інтерфейсу
+let currentLanguage = 'ua'; // Поточна мова інтерфейсу - українська за замовчуванням
 
 // DOM елементи
 const errorMessage = document.getElementById('error-message');
@@ -57,6 +57,9 @@ function initApp() {
   
   // Обробники перемикання мови
   initLanguageSwitch();
+  
+  // Примусово встановлюємо українську мову як основну при завантаженні
+  updateLanguage('ua');
 }
 
 // Ініціалізація перемикача мови
@@ -178,7 +181,9 @@ function updateLanguage(lang) {
   const t = translations[lang];
   
   // Оновлюємо текстові елементи
-  document.querySelector('.card-title:nth-of-type(1)').innerHTML = `<span class="material-symbols-rounded">search</span> ${t.searchTitle}`;
+  // Використовуємо ID для точного таргетування заголовка
+  document.getElementById('search-title').innerHTML = `<span class="material-symbols-rounded">search</span> ${t.searchTitle}`;
+  
   document.querySelector('label[for="player-nickname"]').textContent = t.playerNickname;
   document.getElementById('player-nickname').placeholder = t.playerNicknamePlaceholder;
   document.querySelector('label[for="server"]').textContent = t.server;
@@ -1017,4 +1022,7 @@ function hideMessage(element) {
 }
 
 // Ініціалізація сторінки при завантаженні DOM
-document.addEventListener('DOMContentLoaded', initApp);
+document.addEventListener('DOMContentLoaded', function() {
+  initApp();
+  updateLanguage('ua'); // Примусово оновлюємо мову на українську при завантаженні
+});
