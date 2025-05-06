@@ -119,37 +119,11 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-secondary);
 }
 
-.language-switch {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: var(--bg-card);
-  border-radius: var(--border-radius-md);
-  padding: 0.5rem;
-}
-
-.language-btn {
-  padding: 0.25rem 0.5rem;
-  border-radius: var(--border-radius-sm);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  color: var(--text-secondary);
-  background: transparent;
-  border: none;
-  transition: var(--transition-fast);
-}
-
-.language-btn.active {
-  background-color: var(--primary);
-  color: white;
-}
-
-/* Основний макет з трьома колонками */
+/* Основний макет з двома колонками */
 .main-layout {
   display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: 1rem;
+  grid-template-columns: 320px 1fr; /* Збільшено ширину бічної панелі */
+  gap: 1.5rem; /* Збільшено відступ між колонками */
   flex-grow: 1;
 }
 
@@ -158,7 +132,7 @@ h1, h2, h3, h4, h5, h6 {
   background-color: var(--bg-card);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--card-shadow);
-  padding: 1.25rem;
+  padding: 1.5rem; /* Збільшено внутрішній відступ */
   height: 100%;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -179,6 +153,7 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.25rem;
+  flex-wrap: wrap; /* Дозволяє переносити елементи на новий рядок */
 }
 
 .card-title {
@@ -196,7 +171,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Стилі форм */
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem; /* Збільшено відступ між елементами форми */
 }
 
 label {
@@ -314,12 +289,13 @@ input:focus, select:focus {
   display: flex;
   gap: 0.75rem;
   margin-top: 1rem;
+  margin-bottom: 1rem; /* Додано відступ знизу */
 }
 
 .btn-group {
   display: flex;
   gap: 0.75rem;
-  margin-top: 0.5rem;
+  margin-bottom: 1rem; /* Додано відступ знизу для групи кнопок */
 }
 
 /* Стилі повзунків */
@@ -369,7 +345,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   height: 1px;
   width: 100%;
   background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
-  margin: 1.25rem 0;
+  margin: 1.5rem 0; /* Збільшено відступ від роздільника */
 }
 
 /* Стилі повідомлень */
@@ -471,7 +447,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   animation: slide-out 0.3s ease-out forwards;
 }
 
-/* Стилі для фільтрів - FIXED */
+/* Стилі для фільтрів - Виправлено */
 .filter-select {
   background-color: transparent !important; /* Примусово встановлюємо прозорий фон */
   border: none !important;
@@ -495,6 +471,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
   padding: 0.25rem 0.75rem;
   border-radius: var(--border-radius-md);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex; /* Додано для вирівнювання лейбла та селекта */
+  align-items: center; /* Вирівнювання по центру */
+  min-width: 150px; /* Мінімальна ширина для фільтрів */
 }
 
 .filter-group::after {
@@ -514,14 +493,15 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .filters-container {
   display: flex;
   gap: 0.75rem;
-  margin-bottom: 1rem;
   flex-wrap: wrap;
+  width: 100%; /* Займати всю доступну ширину */
 }
 
 .filter-label {
   color: var(--text-secondary);
   font-size: 0.875rem;
   margin-bottom: 0;
+  margin-right: 0.5rem; /* Відступ між лейблом і селектом */
   white-space: nowrap;
 }
 
