@@ -21,6 +21,7 @@ const openWotBtn = document.getElementById('open-wot-btn');
 function initApp() {
   // Встановлюємо значення поля API ключа - безпечно завантаженого з сховища
   CONFIG.WOT_API_KEY = getSecureApiKey();
+  document.getElementById('wot-api-key').value = CONFIG.WOT_API_KEY;
   
   // Налаштовуємо обробники подій
   document.getElementById('save-settings-btn').addEventListener('click', saveSettings);
@@ -58,12 +59,6 @@ function initApp() {
 // Безпечне зберігання API ключа
 function getSecureApiKey() {
   try {
-    // Використовуємо зашифроване сховище, якщо доступно
-    if (window.crypto && window.crypto.subtle && localStorage.getItem('encryptedApiKey')) {
-      // У реальній реалізації ми б розшифрували тут
-      // Для простоти просто отримуємо з localStorage
-      return localStorage.getItem('wotApiKey') || '';
-    }
     return localStorage.getItem('wotApiKey') || '';
   } catch (error) {
     console.error('Помилка отримання API ключа:', error);
@@ -74,8 +69,6 @@ function getSecureApiKey() {
 // Безпечне збереження API ключа
 function saveSecureApiKey(apiKey) {
   try {
-    // У реальній реалізації ми б зашифрували API ключ
-    // Для простоти просто зберігаємо в localStorage
     localStorage.setItem('wotApiKey', apiKey);
     return true;
   } catch (error) {
@@ -474,3 +467,332 @@ async function loadPlayerBattles() {
     loadBattlesBtn.innerHTML = `<span class="material-symbols-rounded">download</span> Завантажити бої`;
   }
 }
+
+// Отримання останніх боїв з Tomato.gg
+async function getPlayerRecentBattlesFromTomato(accountId, server = 'EU', days = 3, battlesLimit = 100) {
+  try {
+    // Будуємо оновлений URL для API Tomato.gg
+    // Використовуємо прямий URL до боїв гравця замість recents
+    const url = `https://api.tomato.gg/dev/api-v2/player/battles/${accountId}?page=0&days=${days}&battleType=random&pageSize=${battlesLimit}&sortBy=battle_time&sortDirection=desc&platoon=in-and-outside-platoon&spawn=all&won=all&classes=false,false,false,false,false&nations=false,false,false,false,false,false,false,false,false,false,false&tiers=false,false,false,false,false,false,false,false,false,false&tankType=all`;
+    
+    console.log(`Запит до Tomato.gg API: ${url}`);
+    
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP помилка: ${response.status} ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    
+    console.log(`Отримано відповідь від Tomato.gg API:`, data.meta);
+    
+    if (!data.data || data.data.length === 0) {
+      throw new Error('Немає даних про бої');
+    }
+    
+    // Обробка отриманих даних боїв
+    const battles = data.data;
+    
+    // Групуємо бої за танками
+    const tanksMap = new Map();
+    
+    battles.forEach(battle => {
+      const tankId = battle.id;
+      const tankName = battle.name || 'Невідомий танк';
+      const tankType = battle.type || 'unknown';
+      const tier = battle.tier || 0;
+      
+      const key = `${tankName}_${tankType}_${tier}`;
+      
+      if (tanksMap.has(key)) {
+        const existingBattle = tanksMap.get(key);
+        
+        // Оновлюємо статистику
+        existingBattle.battles += 1;
+        existingBattle.damage += battle.damage || 0;
+        existingBattle.frags += battle.frags || 0;
+        
+        // Розрахунок winrate
+        if (battle.won) {
+          existingBattle.wins += 1;
+        }
+        
+        // Оновлюємо середні показники
+        existingBattle.winrate = (existingBattle.wins / existingBattle.battles) * 100;
+        existingBattle.dpg = existingBattle.damage / existingBattle.battles;
+        existingBattle.kpg = existingBattle.frags / existingBattle.battles;
+      } else {
+        tanksMap.set(key, {
+          tank: tankName,
+          tankType: tankType,
+          tier: tier,
+          damage: battle.damage || 0,
+          frags: battle.frags || 0,
+          battles: 1,
+          wins: battle.won ? 1 : 0,
+          winrate: battle.won ? 100 : 0,
+          dpg: battle.damage || 0,
+          kpg: battle.frags || 0
+        });
+      }
+    });
+    
+    console.log(`Згруповано ${tanksMap.size} унікальних танків`);
+    
+    return Array.from(tanksMap.values());
+  } catch (error) {
+    console.error('Помилка завантаження боїв:', error);
+    throw new Error(`Не вдалося завантажити бої з Tomato.gg: ${error.message}`);
+  }
+}
+
+// Відображення боїв гравця
+function displayPlayerBattles(battles) {
+  // Ховаємо індикатор завантаження
+  document.getElementById('loader-container').style.display = 'none';
+  document.getElementById('tanks-list').style.display = 'grid';
+  document.getElementById('stats-summary').style.display = 'block';
+  
+  const tanksListDiv = document.getElementById('tanks-list');
+  
+  if (battles.length === 0) {
+    tanksListDiv.innerHTML = `<div class="loading-text">Немає даних про останні бої</div>`;
+    
+    // Очищаємо статистику
+    document.getElementById('total-battles').textContent = '0';
+    document.getElementById('avg-winrate').textContent = '0%';
+    document.getElementById('avg-damage').textContent = '0';
+    document.getElementById('avg-frags').textContent = '0';
+    
+    return;
+  }
+  
+  let html = '';
+  
+  // Розраховуємо сумарну статистику
+  let totalBattles = 0;
+  let totalDamage = 0;
+  let weightedWinrate = 0;
+  let totalFrags = 0;
+  
+  // Сортуємо танки за кількістю боїв (від більшого до меншого)
+  battles.sort((a, b) => b.battles - a.battles);
+  
+  battles.forEach(battle => {
+    // Оновлюємо сумарну статистику
+    totalBattles += battle.battles;
+    totalDamage += battle.damage;
+    weightedWinrate += battle.winrate * battle.battles; // Зважене середнє
+    totalFrags += battle.frags;
+    
+    // Визначаємо колір відсотка перемог
+    let winrateColor = getWinrateColor(battle.winrate);
+    
+    // Отримуємо значки типу танка
+    const tankTypeIcon = getTankTypeIcon(battle.tankType);
+    
+    // Додаємо картку для танка
+    html += `
+    <div class="tank-card">
+      <div class="tank-header">
+        <div class="tank-name">${battle.tank}</div>
+        <div class="tank-tier">${battle.tier}</div>
+      </div>
+      <div class="tank-type">
+        <span class="material-symbols-rounded">${tankTypeIcon}</span>
+        ${getTankTypeLabel(battle.tankType)}
+      </div>
+      
+      <div class="tank-stats">
+        <div class="tank-stat-item">
+          <div class="tank-stat-value">${battle.battles}</div>
+          <div class="tank-stat-label">Боїв</div>
+        </div>
+        <div class="tank-stat-item">
+          <div class="tank-stat-value" style="color: ${winrateColor};">${battle.winrate.toFixed(2)}%</div>
+          <div class="tank-stat-label">% перемог</div>
+        </div>
+        <div class="tank-stat-item">
+          <div class="tank-stat-value">${battle.dpg.toFixed(0)}</div>
+          <div class="tank-stat-label">Сер. шкода</div>
+        </div>
+        <div class="tank-stat-item">
+          <div class="tank-stat-value">${battle.kpg.toFixed(2)}</div>
+          <div class="tank-stat-label">Сер. фраги</div>
+        </div>
+      </div>
+      
+      <div class="progress-bar-container">
+        <div class="progress-bar" style="width: ${battle.winrate}%; background-color: ${winrateColor};"></div>
+      </div>
+    </div>
+    `;
+  });
+  
+  tanksListDiv.innerHTML = html;
+  
+  // Оновлюємо сумарну статистику
+  const avgWinrate = weightedWinrate / totalBattles;
+  const avgDamage = totalDamage / totalBattles;
+  const avgFrags = totalFrags / totalBattles;
+  
+  document.getElementById('total-battles').textContent = totalBattles.toLocaleString();
+  document.getElementById('avg-winrate').textContent = avgWinrate.toFixed(2) + '%';
+  document.getElementById('avg-damage').textContent = avgDamage.toFixed(0);
+  document.getElementById('avg-frags').textContent = avgFrags.toFixed(2);
+  
+  // Встановлюємо колір відсотка перемог
+  document.getElementById('avg-winrate').style.color = getWinrateColor(avgWinrate);
+}
+
+// Функція для фільтрації боїв
+function filterBattles() {
+  if (!originalBattles || originalBattles.length === 0) return;
+  
+  const tankType = document.getElementById('tank-type-filter').value;
+  const tier = document.getElementById('tier-filter').value;
+  
+  // Клонуємо оригінальні бої
+  let filteredBattles = [...originalBattles];
+  
+  // Фільтруємо за типом танка
+  if (tankType !== 'all') {
+    filteredBattles = filteredBattles.filter(battle => battle.tankType === tankType);
+  }
+  
+  // Фільтруємо за рівнем
+  if (tier !== 'all') {
+    filteredBattles = filteredBattles.filter(battle => battle.tier.toString() === tier);
+  }
+  
+  // Відображаємо відфільтровані бої
+  displayPlayerBattles(filteredBattles);
+}
+
+// Отримання мітки типу танка
+function getTankTypeLabel(type) {
+  switch(type) {
+    case 'HT': return 'Важкий танк';
+    case 'MT': return 'Середній танк';
+    case 'TD': return 'ПТ-САУ';
+    case 'LT': return 'Легкий танк';
+    case 'SPG': return 'САУ';
+    default: return type;
+  }
+}
+
+// Отримання значка типу танка
+function getTankTypeIcon(type) {
+  switch(type) {
+    case 'HT': return 'shield';
+    case 'MT': return 'directions_car';
+    case 'TD': return 'gps_fixed';
+    case 'LT': return 'speed';
+    case 'SPG': return 'rocket_launch';
+    default: return 'help';
+  }
+}
+
+// Отримання кольору відсотка перемог
+function getWinrateColor(winrate) {
+  if (winrate >= 65) return 'var(--rating-unicum)'; // Унікум
+  if (winrate >= 60) return 'var(--rating-super)';  // Супер Унікум
+  if (winrate >= 56) return 'var(--rating-great)';  // Відмінно
+  if (winrate >= 53) return 'var(--rating-good)';   // Добре
+  if (winrate >= 50) return 'var(--rating-average)'; // Середньо
+  if (winrate >= 47) return 'var(--rating-below)';  // Нижче середнього
+  return 'var(--rating-bad)';                       // Погано
+}
+
+// Відкриття профілю на Tomato.GG
+function openTomatoGGProfile() {
+  if (!currentPlayer) {
+    showMessage('Спочатку знайдіть гравця', 'error');
+    return;
+  }
+  
+  const tomatoURL = `https://tomato.gg/stats/${currentPlayer.server}/${encodeURIComponent(currentPlayer.nickname)}-${currentPlayer.id}`;
+  window.open(tomatoURL, '_blank');
+}
+
+// Відкриття профілю на офіційному сайті WoT
+function openWotProfile() {
+  if (!currentPlayer) {
+    showMessage('Спочатку знайдіть гравця', 'error');
+    return;
+  }
+  
+  let wotDomain = 'https://worldoftanks.eu';
+  
+  switch(currentPlayer.server) {
+    case 'NA':
+      wotDomain = 'https://worldoftanks.com';
+      break;
+    case 'ASIA':
+      wotDomain = 'https://worldoftanks.asia';
+      break;
+  }
+  
+  const wotURL = `${wotDomain}/en/community/accounts/${currentPlayer.id}-${encodeURIComponent(currentPlayer.nickname)}/`;
+  window.open(wotURL, '_blank');
+}
+
+// Функція для показу повідомлень
+function showMessage(message, type) {
+  const errorEl = document.getElementById('error-message');
+  const successEl = document.getElementById('success-message');
+  
+  // Спочатку ховаємо всі повідомлення
+  errorEl.style.display = 'none';
+  successEl.style.display = 'none';
+  
+  // Видаляємо клас анімації виходу, якщо він був
+  errorEl.classList.remove('slide-out');
+  successEl.classList.remove('slide-out');
+  
+  let alertEl;
+  
+  if (type === 'error') {
+    alertEl = errorEl;
+    // Оновлюємо вміст повідомлення з іконкою
+    alertEl.querySelector('.alert-message').textContent = message;
+  } else {
+    alertEl = successEl;
+    // Оновлюємо вміст повідомлення з іконкою
+    alertEl.querySelector('.alert-message').textContent = message;
+  }
+  
+  // Додаємо обробник закриття
+  const closeBtn = alertEl.querySelector('.alert-close');
+  if (closeBtn) {
+    closeBtn.onclick = function() {
+      hideMessage(alertEl);
+    };
+  }
+  
+  // Показуємо повідомлення
+  alertEl.style.display = 'block';
+  
+  // Автоматично ховаємо повідомлення через 5 секунд
+  setTimeout(() => {
+    hideMessage(alertEl);
+  }, 5000);
+}
+
+// Плавно ховаємо повідомлення
+function hideMessage(element) {
+  if (element && element.style.display !== 'none') {
+    element.classList.add('slide-out');
+    
+    // Прибираємо елемент після завершення анімації
+    setTimeout(() => {
+      element.style.display = 'none';
+      element.classList.remove('slide-out');
+    }, 300); // 300мс - тривалість анімації
+  }
+}
+
+// Ініціалізація сторінки при завантаженні DOM
+document.addEventListener('DOMContentLoaded', function() {
+  initApp();
+});
