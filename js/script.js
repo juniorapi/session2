@@ -1,3 +1,4 @@
+```javascript
 // Конфігурація
 const CONFIG = {
   // Отримуємо API ключ з безпечного сховища або використовуємо пустий рядок за замовчуванням
@@ -9,7 +10,6 @@ const CONFIG = {
 let currentPlayer = null;
 let playerBattles = [];
 let originalBattles = []; // Зберігаємо оригінальні дані для фільтрування
-let currentLanguage = 'ua'; // Поточна мова інтерфейсу - українська за замовчуванням
 
 // DOM елементи
 const errorMessage = document.getElementById('error-message');
@@ -54,185 +54,6 @@ function initApp() {
   
   // Ініціалізуємо обробники для сповіщень
   initNotifications();
-  
-  // Обробники перемикання мови
-  initLanguageSwitch();
-  
-  // Примусово встановлюємо українську мову як основну при завантаженні
-  updateLanguage('ua');
-}
-
-// Ініціалізація перемикача мови
-function initLanguageSwitch() {
-  const langButtons = document.querySelectorAll('.language-btn');
-  langButtons.forEach(btn => {
-    btn.addEventListener('click', function() {
-      // Видаляємо клас active з усіх кнопок
-      langButtons.forEach(b => b.classList.remove('active'));
-      // Додаємо клас active до натиснутої кнопки
-      this.classList.add('active');
-      
-      // Встановлюємо поточну мову
-      currentLanguage = this.textContent.toLowerCase();
-      
-      // Оновлюємо інтерфейс відповідно до вибраної мови
-      updateLanguage(currentLanguage);
-    });
-  });
-}
-
-// Оновлення мови інтерфейсу
-function updateLanguage(lang) {
-  const translations = {
-    ua: {
-      searchTitle: 'Пошук гравця',
-      playerNickname: 'Нікнейм гравця',
-      playerNicknamePlaceholder: 'Введіть нікнейм гравця',
-      server: 'Сервер',
-      europeServer: 'Європа (EU)',
-      naServer: 'Північна Америка (NA)',
-      asiaServer: 'Азія (ASIA)',
-      battlesCount: 'Кількість боїв',
-      daysCount: 'Кількість днів',
-      loadBattles: 'Завантажити бої',
-      loading: 'Завантаження...',
-      apiSettings: 'API Налаштування',
-      apiKey: 'WoT API Ключ',
-      apiKeyPlaceholder: 'Введіть ваш WoT API ключ',
-      apiKeySecurity: 'Ваш API ключ безпечно зберігається лише у вашому браузері.',
-      recentBattles: 'Останні бої',
-      type: 'Тип:',
-      allTypes: 'Всі типи',
-      heavyTanks: 'Важкі танки',
-      mediumTanks: 'Середні танки',
-      tankDestroyers: 'ПТ-САУ',
-      lightTanks: 'Легкі танки',
-      artillery: 'САУ',
-      tier: 'Рівень:',
-      all: 'Всі',
-      battles: 'Боїв',
-      winRate: '% перемог',
-      avgDamage: 'Сер. шкода',
-      avgFrags: 'Сер. фраги',
-      loadingBattles: 'Завантаження боїв...',
-      lastBattle: 'Останній бій:',
-      playerNotFound: 'Гравця не знайдено',
-      enterNickname: 'Введіть нікнейм гравця',
-      findPlayerFirst: 'Спочатку знайдіть гравця',
-      playerFound: 'Гравця знайдено',
-      loadedStats: 'Завантажено статистику за',
-      days: 'днів',
-      noRecentBattles: 'Немає даних про останні бої',
-      errorLoadingData: 'Помилка завантаження даних',
-      errorLoadingBattles: 'Помилка завантаження боїв',
-      errorHelp: 'Спробуйте оновити сторінку або перевірте підключення до Інтернету. Також можливо, що сервіс Tomato.gg тимчасово недоступний.',
-      settingsSaved: 'Налаштування збережено успішно',
-      enterApiKey: 'Будь ласка, введіть коректний API ключ',
-      apiKeyMissing: 'API ключ відсутній. Будь ласка, введіть ваш WoT API ключ в налаштуваннях.'
-    },
-    en: {
-      searchTitle: 'Player Search',
-      playerNickname: 'Player Nickname',
-      playerNicknamePlaceholder: 'Enter player nickname',
-      server: 'Server',
-      europeServer: 'Europe (EU)',
-      naServer: 'North America (NA)',
-      asiaServer: 'Asia (ASIA)',
-      battlesCount: 'Number of Battles',
-      daysCount: 'Number of Days',
-      loadBattles: 'Load Battles',
-      loading: 'Loading...',
-      apiSettings: 'API Settings',
-      apiKey: 'WoT API Key',
-      apiKeyPlaceholder: 'Enter your WoT API key',
-      apiKeySecurity: 'Your API key is stored securely in your browser.',
-      recentBattles: 'Recent Battles',
-      type: 'Type:',
-      allTypes: 'All types',
-      heavyTanks: 'Heavy Tanks',
-      mediumTanks: 'Medium Tanks',
-      tankDestroyers: 'Tank Destroyers',
-      lightTanks: 'Light Tanks',
-      artillery: 'Artillery',
-      tier: 'Tier:',
-      all: 'All',
-      battles: 'Battles',
-      winRate: 'Win Rate',
-      avgDamage: 'Avg. Damage',
-      avgFrags: 'Avg. Frags',
-      loadingBattles: 'Loading battles...',
-      lastBattle: 'Last battle:',
-      playerNotFound: 'Player not found',
-      enterNickname: 'Please enter a player nickname',
-      findPlayerFirst: 'Please find a player first',
-      playerFound: 'Player found',
-      loadedStats: 'Loaded statistics for the last',
-      days: 'days',
-      noRecentBattles: 'No data for recent battles',
-      errorLoadingData: 'Failed to load data',
-      errorLoadingBattles: 'Error loading battles',
-      errorHelp: 'Try refreshing the page or check your internet connection. The Tomato.gg service may also be temporarily unavailable.',
-      settingsSaved: 'Settings saved successfully',
-      enterApiKey: 'Please enter a valid API key',
-      apiKeyMissing: 'API key is missing. Please enter your WoT API key in settings.'
-    }
-  };
-  
-  const t = translations[lang];
-  
-  // Оновлюємо текстові елементи
-  // Використовуємо ID для точного таргетування заголовка
-  document.getElementById('search-title').innerHTML = `<span class="material-symbols-rounded">search</span> ${t.searchTitle}`;
-  
-  document.querySelector('label[for="player-nickname"]').textContent = t.playerNickname;
-  document.getElementById('player-nickname').placeholder = t.playerNicknamePlaceholder;
-  document.querySelector('label[for="server"]').textContent = t.server;
-  document.querySelector('#server option:nth-child(1)').textContent = t.europeServer;
-  document.querySelector('#server option:nth-child(2)').textContent = t.naServer;
-  document.querySelector('#server option:nth-child(3)').textContent = t.asiaServer;
-  document.querySelector('label[for="battles-range"]').textContent = t.battlesCount;
-  document.querySelector('label[for="days-range"]').textContent = t.daysCount;
-  document.getElementById('load-battles-btn').innerHTML = `<span class="material-symbols-rounded">download</span> ${t.loadBattles}`;
-  document.querySelector('.card-header:nth-of-type(3) .card-title').innerHTML = `<span class="material-symbols-rounded">key</span> ${t.apiSettings}`;
-  document.querySelector('label[for="wot-api-key"]').textContent = t.apiKey;
-  document.getElementById('wot-api-key').placeholder = t.apiKeyPlaceholder;
-  document.querySelector('.input-wrapper + small').textContent = t.apiKeySecurity;
-  
-  if (document.querySelector('#battles-list-card .card-title')) {
-    document.querySelector('#battles-list-card .card-title').innerHTML = `<span class="material-symbols-rounded">military_tech</span> ${t.recentBattles}`;
-  }
-  
-  document.querySelector('.filter-label:nth-of-type(1)').textContent = t.type;
-  document.querySelector('#tank-type-filter option:nth-child(1)').textContent = t.allTypes;
-  document.querySelector('#tank-type-filter option:nth-child(2)').textContent = t.heavyTanks;
-  document.querySelector('#tank-type-filter option:nth-child(3)').textContent = t.mediumTanks;
-  document.querySelector('#tank-type-filter option:nth-child(4)').textContent = t.tankDestroyers;
-  document.querySelector('#tank-type-filter option:nth-child(5)').textContent = t.lightTanks;
-  document.querySelector('#tank-type-filter option:nth-child(6)').textContent = t.artillery;
-  
-  document.querySelector('.filter-label:nth-of-type(2)').textContent = t.tier;
-  document.querySelector('#tier-filter option:nth-child(1)').textContent = t.all;
-  
-  if (document.getElementById('stats-summary')) {
-    const statLabels = document.querySelectorAll('#stats-summary .stat-label');
-    if (statLabels.length >= 4) {
-      statLabels[0].textContent = t.battles;
-      statLabels[1].textContent = t.winRate;
-      statLabels[2].textContent = t.avgDamage;
-      statLabels[3].textContent = t.avgFrags;
-    }
-  }
-  
-  document.getElementById('battles-loading-text').textContent = t.loadingBattles;
-  
-  // Якщо є гравець і бої, оновлюємо їх відображення також
-  if (currentPlayer && currentPlayer.details) {
-    displayPlayerInfo();
-  }
-  
-  if (playerBattles.length > 0) {
-    displayPlayerBattles(playerBattles);
-  }
 }
 
 // Безпечне зберігання API ключа
@@ -281,15 +102,15 @@ function saveSettings() {
   const apiKey = document.getElementById('wot-api-key').value.trim();
   
   if (!apiKey) {
-    showMessage(currentLanguage === 'ua' ? 'Будь ласка, введіть коректний API ключ' : 'Please enter a valid API key', 'error');
+    showMessage('Будь ласка, введіть коректний API ключ', 'error');
     return;
   }
   
   if (saveSecureApiKey(apiKey)) {
     CONFIG.WOT_API_KEY = apiKey;
-    showMessage(currentLanguage === 'ua' ? 'Налаштування збережено успішно' : 'Settings saved successfully', 'success');
+    showMessage('Налаштування збережено успішно', 'success');
   } else {
-    showMessage(currentLanguage === 'ua' ? 'Не вдалося зберегти налаштування' : 'Failed to save settings', 'error');
+    showMessage('Не вдалося зберегти налаштування', 'error');
   }
 }
 
@@ -321,12 +142,12 @@ async function searchPlayer() {
   const server = document.getElementById('server').value;
   
   if (!nickname) {
-    showMessage(currentLanguage === 'ua' ? 'Введіть нікнейм гравця' : 'Please enter a player nickname', 'error');
+    showMessage('Введіть нікнейм гравця', 'error');
     return;
   }
   
   if (!CONFIG.WOT_API_KEY) {
-    showMessage(currentLanguage === 'ua' ? 'API ключ відсутній. Будь ласка, введіть ваш WoT API ключ в налаштуваннях.' : 'API key is missing. Please enter your WoT API key in settings.', 'error');
+    showMessage('API ключ відсутній. Будь ласка, введіть ваш WoT API ключ в налаштуваннях.', 'error');
     return;
   }
   
@@ -344,7 +165,7 @@ async function searchPlayer() {
     const player = await getPlayerByNickname(nickname, server);
     
     if (!player) {
-      showMessage(currentLanguage === 'ua' ? `Гравця з нікнеймом "${nickname}" не знайдено` : `Player "${nickname}" not found`, 'error');
+      showMessage(`Гравця з нікнеймом "${nickname}" не знайдено`, 'error');
       resetSearchForm();
       return;
     }
@@ -374,7 +195,7 @@ async function searchPlayer() {
     // Показуємо картку з інформацією про гравця
     document.getElementById('player-info-card').style.display = 'block';
     
-    showMessage(currentLanguage === 'ua' ? `Гравця "${player.nickname}" знайдено` : `Player "${player.nickname}" found`, 'success');
+    showMessage(`Гравця "${player.nickname}" знайдено`, 'success');
   } catch (error) {
     console.error('Помилка пошуку гравця:', error);
     showMessage('Помилка: ' + error.message, 'error');
@@ -422,7 +243,7 @@ async function getPlayerByNickname(nickname, server = 'EU') {
     return null;
   } catch (error) {
     console.error('Помилка отримання даних гравця:', error);
-    throw new Error(currentLanguage === 'ua' ? 'Не вдалося отримати дані гравця' : 'Failed to get player data');
+    throw new Error('Не вдалося отримати дані гравця');
   }
 }
 
@@ -541,10 +362,9 @@ function displayPlayerInfo() {
   if (currentPlayer.details && currentPlayer.details.last_battle_time) {
     const lastBattleTime = new Date(currentPlayer.details.last_battle_time * 1000);
     const dateOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-    const lastBattleLabel = currentLanguage === 'ua' ? 'Останній бій:' : 'Last battle:';
     html += `<div class="player-last-battle">
       <span class="material-symbols-rounded">schedule</span>
-      ${lastBattleLabel} ${lastBattleTime.toLocaleDateString(currentLanguage === 'ua' ? 'uk-UA' : 'en-US', dateOptions)}
+      Останній бій: ${lastBattleTime.toLocaleDateString('uk-UA', dateOptions)}
     </div>`;
   }
   
@@ -555,19 +375,12 @@ function displayPlayerInfo() {
     html += '<div class="player-stats-container">';
     
     // Основні показники
-    const battleLabel = currentLanguage === 'ua' ? 'Боїв' : 'Battles';
-    const winrateLabel = currentLanguage === 'ua' ? '% перемог' : 'Win Rate';
-    const avgDamageLabel = currentLanguage === 'ua' ? 'Сер. шкода' : 'Avg. Damage';
-    const avgFragsLabel = currentLanguage === 'ua' ? 'Сер. фраги' : 'Avg. Frags';
-    const avgSpottingLabel = currentLanguage === 'ua' ? 'Виявлення' : 'Spotting';
-    const defenseLabel = currentLanguage === 'ua' ? 'Захист' : 'Defense';
-    
-    html += createStatCard(battleLabel, stats.battles.toLocaleString());
-    html += createStatCard(winrateLabel, `${(stats.wins / stats.battles * 100).toFixed(2)}%`, getWinrateColor(stats.wins / stats.battles * 100));
-    html += createStatCard(avgDamageLabel, (stats.damage_dealt / stats.battles).toFixed(0));
-    html += createStatCard(avgFragsLabel, (stats.frags / stats.battles).toFixed(2));
-    html += createStatCard(avgSpottingLabel, (stats.spotted / stats.battles).toFixed(2));
-    html += createStatCard(defenseLabel, (stats.dropped_capture_points / stats.battles).toFixed(1));
+    html += createStatCard('Боїв', stats.battles.toLocaleString());
+    html += createStatCard('% перемог', `${(stats.wins / stats.battles * 100).toFixed(2)}%`, getWinrateColor(stats.wins / stats.battles * 100));
+    html += createStatCard('Сер. шкода', (stats.damage_dealt / stats.battles).toFixed(0));
+    html += createStatCard('Сер. фраги', (stats.frags / stats.battles).toFixed(2));
+    html += createStatCard('Виявлення', (stats.spotted / stats.battles).toFixed(2));
+    html += createStatCard('Захист', (stats.dropped_capture_points / stats.battles).toFixed(1));
     
     html += '</div>'; // player-stats-container
   }
@@ -593,8 +406,7 @@ function createStatCard(label, value, color = null) {
 // Завантаження останніх боїв гравця з Tomato.gg
 async function loadPlayerBattles() {
   if (!currentPlayer) {
-    const message = currentLanguage === 'ua' ? 'Спочатку знайдіть гравця' : 'Please find a player first';
-    showMessage(message, 'error');
+    showMessage('Спочатку знайдіть гравця', 'error');
     return;
   }
   
@@ -609,16 +421,12 @@ async function loadPlayerBattles() {
   document.getElementById('stats-summary').style.display = 'none';
   
   // Оновлюємо текст завантаження
-  const loadingText = currentLanguage === 'ua' 
-    ? `Завантаження боїв для ${currentPlayer.nickname} (${currentPlayer.server})...` 
-    : `Loading battles for ${currentPlayer.nickname} (${currentPlayer.server})...`;
-  document.getElementById('battles-loading-text').textContent = loadingText;
+  document.getElementById('battles-loading-text').textContent = `Завантаження боїв для ${currentPlayer.nickname} (${currentPlayer.server})...`;
   
   try {
     // Деактивуємо кнопку завантаження
     loadBattlesBtn.disabled = true;
-    const loadingLabel = currentLanguage === 'ua' ? 'Завантаження...' : 'Loading...';
-    loadBattlesBtn.innerHTML = `<span class="material-symbols-rounded">hourglass_empty</span> ${loadingLabel}`;
+    loadBattlesBtn.innerHTML = `<span class="material-symbols-rounded">hourglass_empty</span> Завантаження...`;
     
     // Завантажуємо бої з Tomato.gg
     const battlesList = await getPlayerRecentBattlesFromTomato(
@@ -635,10 +443,7 @@ async function loadPlayerBattles() {
     // Відображаємо бої
     displayPlayerBattles(battlesList);
     
-    const successMessage = currentLanguage === 'ua' 
-      ? `Завантажено статистику за ${document.getElementById('days-range').value} днів` 
-      : `Loaded statistics for the last ${document.getElementById('days-range').value} days`;
-    showMessage(successMessage, 'success');
+    showMessage(`Завантажено статистику за ${document.getElementById('days-range').value} днів`, 'success');
   } catch (error) {
     console.error('Помилка завантаження боїв:', error);
     
@@ -646,30 +451,23 @@ async function loadPlayerBattles() {
     const tanksListDiv = document.getElementById('tanks-list');
     tanksListDiv.style.display = 'block';
     
-    const errorLoadingData = currentLanguage === 'ua' ? 'Помилка завантаження даних' : 'Failed to load data';
-    const errorHelp = currentLanguage === 'ua' 
-      ? 'Спробуйте оновити сторінку або перевірте підключення до Інтернету. Також можливо, що сервіс Tomato.gg тимчасово недоступний.' 
-      : 'Try refreshing the page or check your internet connection. The Tomato.gg service may also be temporarily unavailable.';
-    
     tanksListDiv.innerHTML = `
       <div class="error-container">
         <div class="error-icon"><span class="material-symbols-rounded">error</span></div>
-        <div class="error-message">${errorLoadingData}</div>
+        <div class="error-message">Помилка завантаження даних</div>
         <div class="error-description">${error.message}</div>
-        <div class="error-help">${errorHelp}</div>
+        <div class="error-help">Спробуйте оновити сторінку або перевірте підключення до Інтернету. Також можливо, що сервіс Tomato.gg тимчасово недоступний.</div>
       </div>
     `;
     
     document.getElementById('stats-summary').style.display = 'none';
     document.getElementById('loader-container').style.display = 'none';
     
-    const errorLoadingBattles = currentLanguage === 'ua' ? 'Помилка завантаження боїв:' : 'Error loading battles:';
-    showMessage(`${errorLoadingBattles} ${error.message}`, 'error');
+    showMessage(`Помилка завантаження боїв: ${error.message}`, 'error');
   } finally {
     // Відновлюємо кнопку завантаження
     loadBattlesBtn.disabled = false;
-    const loadBattlesLabel = currentLanguage === 'ua' ? 'Завантажити бої' : 'Load Battles';
-    loadBattlesBtn.innerHTML = `<span class="material-symbols-rounded">download</span> ${loadBattlesLabel}`;
+    loadBattlesBtn.innerHTML = `<span class="material-symbols-rounded">download</span> Завантажити бої`;
   }
 }
 
@@ -692,8 +490,7 @@ async function getPlayerRecentBattlesFromTomato(accountId, server = 'EU', days =
     console.log(`Отримано відповідь від Tomato.gg API:`, data.meta);
     
     if (!data.data || data.data.length === 0) {
-      const noBattlesData = currentLanguage === 'ua' ? 'Немає даних про бої' : 'No battle data available';
-      throw new Error(noBattlesData);
+      throw new Error('Немає даних про бої');
     }
     
     // Обробка отриманих даних боїв
@@ -704,7 +501,7 @@ async function getPlayerRecentBattlesFromTomato(accountId, server = 'EU', days =
     
     battles.forEach(battle => {
       const tankId = battle.id;
-      const tankName = battle.name || (currentLanguage === 'ua' ? 'Невідомий танк' : 'Unknown tank');
+      const tankName = battle.name || 'Невідомий танк';
       const tankType = battle.type || 'unknown';
       const tier = battle.tier || 0;
       
@@ -748,10 +545,7 @@ async function getPlayerRecentBattlesFromTomato(accountId, server = 'EU', days =
     return Array.from(tanksMap.values());
   } catch (error) {
     console.error('Помилка завантаження боїв:', error);
-    const failedToLoad = currentLanguage === 'ua' 
-      ? `Не вдалося завантажити бої з Tomato.gg: ${error.message}` 
-      : `Failed to load battles from Tomato.gg: ${error.message}`;
-    throw new Error(failedToLoad);
+    throw new Error(`Не вдалося завантажити бої з Tomato.gg: ${error.message}`);
   }
 }
 
@@ -765,8 +559,7 @@ function displayPlayerBattles(battles) {
   const tanksListDiv = document.getElementById('tanks-list');
   
   if (battles.length === 0) {
-    const noRecentBattles = currentLanguage === 'ua' ? 'Немає даних про останні бої' : 'No data for recent battles';
-    tanksListDiv.innerHTML = `<div class="loading-text">${noRecentBattles}</div>`;
+    tanksListDiv.innerHTML = `<div class="loading-text">Немає даних про останні бої</div>`;
     
     // Очищаємо статистику
     document.getElementById('total-battles').textContent = '0';
@@ -801,12 +594,6 @@ function displayPlayerBattles(battles) {
     // Отримуємо значки типу танка
     const tankTypeIcon = getTankTypeIcon(battle.tankType);
     
-    // Локалізовані підписи
-    const battlesLabel = currentLanguage === 'ua' ? 'Боїв' : 'Battles';
-    const winrateLabel = currentLanguage === 'ua' ? '% перемог' : 'Win Rate';
-    const avgDamageLabel = currentLanguage === 'ua' ? 'Сер. шкода' : 'Avg. Damage';
-    const avgFragsLabel = currentLanguage === 'ua' ? 'Сер. фраги' : 'Avg. Frags';
-    
     // Додаємо картку для танка
     html += `
     <div class="tank-card">
@@ -822,19 +609,19 @@ function displayPlayerBattles(battles) {
       <div class="tank-stats">
         <div class="tank-stat-item">
           <div class="tank-stat-value">${battle.battles}</div>
-          <div class="tank-stat-label">${battlesLabel}</div>
+          <div class="tank-stat-label">Боїв</div>
         </div>
         <div class="tank-stat-item">
           <div class="tank-stat-value" style="color: ${winrateColor};">${battle.winrate.toFixed(2)}%</div>
-          <div class="tank-stat-label">${winrateLabel}</div>
+          <div class="tank-stat-label">% перемог</div>
         </div>
         <div class="tank-stat-item">
           <div class="tank-stat-value">${battle.dpg.toFixed(0)}</div>
-          <div class="tank-stat-label">${avgDamageLabel}</div>
+          <div class="tank-stat-label">Сер. шкода</div>
         </div>
         <div class="tank-stat-item">
           <div class="tank-stat-value">${battle.kpg.toFixed(2)}</div>
-          <div class="tank-stat-label">${avgFragsLabel}</div>
+          <div class="tank-stat-label">Сер. фраги</div>
         </div>
       </div>
       
@@ -887,24 +674,13 @@ function filterBattles() {
 
 // Отримання мітки типу танка
 function getTankTypeLabel(type) {
-  if (currentLanguage === 'ua') {
-    switch(type) {
-      case 'HT': return 'Важкий танк';
-      case 'MT': return 'Середній танк';
-      case 'TD': return 'ПТ-САУ';
-      case 'LT': return 'Легкий танк';
-      case 'SPG': return 'САУ';
-      default: return type;
-    }
-  } else {
-    switch(type) {
-      case 'HT': return 'Heavy Tank';
-      case 'MT': return 'Medium Tank';
-      case 'TD': return 'Tank Destroyer';
-      case 'LT': return 'Light Tank';
-      case 'SPG': return 'Artillery';
-      default: return type;
-    }
+  switch(type) {
+    case 'HT': return 'Важкий танк';
+    case 'MT': return 'Середній танк';
+    case 'TD': return 'ПТ-САУ';
+    case 'LT': return 'Легкий танк';
+    case 'SPG': return 'САУ';
+    default: return type;
   }
 }
 
@@ -934,8 +710,7 @@ function getWinrateColor(winrate) {
 // Відкриття профілю на Tomato.GG
 function openTomatoGGProfile() {
   if (!currentPlayer) {
-    const message = currentLanguage === 'ua' ? 'Спочатку знайдіть гравця' : 'Please find a player first';
-    showMessage(message, 'error');
+    showMessage('Спочатку знайдіть гравця', 'error');
     return;
   }
   
@@ -946,8 +721,7 @@ function openTomatoGGProfile() {
 // Відкриття профілю на офіційному сайті WoT
 function openWotProfile() {
   if (!currentPlayer) {
-    const message = currentLanguage === 'ua' ? 'Спочатку знайдіть гравця' : 'Please find a player first';
-    showMessage(message, 'error');
+    showMessage('Спочатку знайдіть гравця', 'error');
     return;
   }
   
@@ -1024,5 +798,4 @@ function hideMessage(element) {
 // Ініціалізація сторінки при завантаженні DOM
 document.addEventListener('DOMContentLoaded', function() {
   initApp();
-  updateLanguage('ua'); // Примусово оновлюємо мову на українську при завантаженні
 });

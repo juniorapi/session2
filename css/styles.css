@@ -1,3 +1,5 @@
+/* Повний виправлений CSS без функції зміни мови */
+
 :root {
   /* Основна палітра */
   --primary: #4f46e5;
@@ -119,33 +121,7 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-secondary);
 }
 
-.language-switch {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: var(--bg-card);
-  border-radius: var(--border-radius-md);
-  padding: 0.5rem;
-}
-
-.language-btn {
-  padding: 0.25rem 0.5rem;
-  border-radius: var(--border-radius-sm);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  color: var(--text-secondary);
-  background: transparent;
-  border: none;
-  transition: var(--transition-fast);
-}
-
-.language-btn.active {
-  background-color: var(--primary);
-  color: white;
-}
-
-/* Основний макет з трьома колонками */
+/* Основний макет з двома колонками */
 .main-layout {
   display: grid;
   grid-template-columns: 300px 1fr;
@@ -177,8 +153,9 @@ h1, h2, h3, h4, h5, h6 {
 .card-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start; /* Змінено з center для дозволу перенесення */
   margin-bottom: 1.25rem;
+  flex-wrap: wrap; /* Дозволяємо перенесення для малих екранів */
 }
 
 .card-title {
@@ -188,6 +165,7 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  margin-bottom: 0.5rem; /* Додано для забезпечення відступу при перенесенні */
 }
 
 .card-title .material-symbols-rounded {
@@ -314,12 +292,24 @@ input:focus, select:focus {
   display: flex;
   gap: 0.75rem;
   margin-top: 1rem;
+  width: 100%; /* Забезпечуємо повну ширину */
 }
 
+/* ВИПРАВЛЕНО: Покращено розташування групи кнопок для запобігання переповнення */
 .btn-group {
   display: flex;
   gap: 0.75rem;
   margin-top: 0.5rem;
+  flex-wrap: wrap; /* Дозволяємо кнопкам переноситися на малих екранах */
+  width: 100%; /* Займаємо повну ширину батьківського елемента */
+}
+
+.btn-group .btn {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap; /* Allow buttons to wrap on small screens */
+  width: 100%; /* Take full width of parent */
 }
 
 /* Стилі повзунків */
@@ -471,30 +461,32 @@ input[type="range"]::-webkit-slider-thumb:hover {
   animation: slide-out 0.3s ease-out forwards;
 }
 
-/* Стилі для фільтрів - FIXED */
+/* ВИПРАВЛЕНО: Стилі для фільтрів */
 .filter-select {
-  background-color: transparent !important; /* Примусово встановлюємо прозорий фон */
+  background-color: transparent !important;
   border: none !important;
   color: var(--text-primary) !important;
   font-size: 0.875rem;
   padding: 0.25rem 0.5rem;
   font-weight: 500;
-  -webkit-appearance: none; /* Прибираємо стандартний вигляд для Safari/Chrome */
-  -moz-appearance: none; /* Прибираємо стандартний вигляд для Firefox */
-  appearance: none; /* Прибираємо стандартний вигляд */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
 .filter-select option {
-  background-color: var(--bg-card); /* Темний фон для випадаючого списку */
+  background-color: var(--bg-card);
   color: var(--text-primary);
 }
 
 .filter-group {
-  position: relative; /* Для створення стрілки випадаючого списку */
+  position: relative;
   background-color: var(--bg-card);
   padding: 0.25rem 0.75rem;
   border-radius: var(--border-radius-md);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 130px; /* Забезпечуємо мінімальну ширину для читабельності */
+  max-width: 100%; /* Запобігаємо переповненню на малих екранах */
 }
 
 .filter-group::after {
@@ -508,14 +500,17 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
   border-top: 5px solid var(--text-secondary);
-  pointer-events: none; /* Щоб не заважало натискати на селект */
+  pointer-events: none;
 }
 
+/* ВИПРАВЛЕНО: Покращено макет контейнера фільтрів */
 .filters-container {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.75rem;
   margin-bottom: 1rem;
-  flex-wrap: wrap;
+  margin-top: 0.5rem; /* Додано відступ від заголовка */
+  width: 100%; /* Забезпечуємо повну ширину */
 }
 
 .filter-label {
@@ -852,7 +847,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   }
 }
 
-/* Адаптивні стилі */
+/* ВИПРАВЛЕНО: Покращені адаптивні стилі */
 @media (max-width: 992px) {
   .main-layout {
     grid-template-columns: 1fr;
@@ -892,6 +887,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   
   .btn {
     width: 100%;
+    margin-bottom: 0.5rem; /* Додаємо відступ між штабельованими кнопками */
   }
   
   .player-info-container {
@@ -914,10 +910,29 @@ input[type="range"]::-webkit-slider-thumb:hover {
   .tanks-list {
     grid-template-columns: 1fr;
   }
+  
+  /* ВИПРАВЛЕНО: Робимо фільтри більш зручними для мобільних пристроїв */
+  .filters-container {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .filter-group {
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
   .player-stats-container {
     grid-template-columns: 1fr;
+  }
+  
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .filters-container {
+    margin-top: 1rem;
   }
 }
