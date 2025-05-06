@@ -23,6 +23,11 @@
         <h1 class="logo">WoT Stats Pro</h1>
         <p class="subtitle">Статистика танкіста</p>
       </div>
+      
+      <div class="language-switch">
+        <button class="language-btn active">UA</button>
+        <button class="language-btn">EN</button>
+      </div>
     </header>
 
     <div class="main-layout">
@@ -126,37 +131,37 @@
                 <span class="material-symbols-rounded">military_tech</span>
                 Останні бої
               </h2>
-            </div>
-            
-            <!-- Фільтри - змінено розташування, тепер поза card-header -->
-            <div class="filters-container">
-              <div class="filter-group">
-                <label class="filter-label">Тип:</label>
-                <select id="tank-type-filter" class="filter-select">
-                  <option value="all">Всі типи</option>
-                  <option value="HT">Важкі танки</option>
-                  <option value="MT">Середні танки</option>
-                  <option value="TD">ПТ-САУ</option>
-                  <option value="LT">Легкі танки</option>
-                  <option value="SPG">САУ</option>
-                </select>
-              </div>
               
-              <div class="filter-group">
-                <label class="filter-label">Рівень:</label>
-                <select id="tier-filter" class="filter-select">
-                  <option value="all">Всі</option>
-                  <option value="10">10</option>
-                  <option value="9">9</option>
-                  <option value="8">8</option>
-                  <option value="7">7</option>
-                  <option value="6">6</option>
-                  <option value="5">5</option>
-                  <option value="4">4</option>
-                  <option value="3">3</option>
-                  <option value="2">2</option>
-                  <option value="1">1</option>
-                </select>
+              <!-- Фільтри -->
+              <div class="filters-container">
+                <div class="filter-group">
+                  <label class="filter-label">Тип:</label>
+                  <select id="tank-type-filter" class="filter-select">
+                    <option value="all">Всі типи</option>
+                    <option value="HT">Важкі танки</option>
+                    <option value="MT">Середні танки</option>
+                    <option value="TD">ПТ-САУ</option>
+                    <option value="LT">Легкі танки</option>
+                    <option value="SPG">САУ</option>
+                  </select>
+                </div>
+                
+                <div class="filter-group">
+                  <label class="filter-label">Рівень:</label>
+                  <select id="tier-filter" class="filter-select">
+                    <option value="all">Всі</option>
+                    <option value="10">10</option>
+                    <option value="9">9</option>
+                    <option value="8">8</option>
+                    <option value="7">7</option>
+                    <option value="6">6</option>
+                    <option value="5">5</option>
+                    <option value="4">4</option>
+                    <option value="3">3</option>
+                    <option value="2">2</option>
+                    <option value="1">1</option>
+                  </select>
+                </div>
               </div>
             </div>
             
